@@ -11,7 +11,46 @@
             {% block importmap %}{{ importmap('app') }}{% endblock %}
         {% endblock %}
     </head>
-    <body>
+
+    <body class="wrapper">
+        <header>
+        <figure>
+            <img src="{{ asset('images/Logo.png') }}" alt="Logo Stubborn">
+            <figcaption>Don't compromise on your look</figcaption>
+        </figure>
+        <nav>
+            <ul>
+                <a href="{{ path('app_home') }}">Accueil</a>
+
+                {% if not app.user %}
+                <a href="{{ path('app_register') }}">S'inscrire</a>
+                <a href="{{ path('app_login') }}">Se connecter</a>
+            
+                {% else %}
+                <a href="{{ path('app_home') }}">Boutique</a>
+                <a href="{{ path('app_home') }}">Panier</a>
+            
+                {% if 'ROLE_ADMIN' in app.user.roles %}
+                <a href="{{ path('admin_dashboard') }}">Admin</a>
+                {% endif %}
+            
+                    <a href="{{ path('app_logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Se Déconnecter</a>
+                    <form id="logout-form" action="{{ path('app_logout') }}" method="post" style="display: none;" </form>
+                
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+
+    <main>
         {% block body %}{% endblock %}
+    </main>
+
+    <footer>
+        <h2>Informations de la Société</h2>
+        <p>Nom de la société: Stubborn</p>
+        <p>Adresse: Piccadilly Circus, London W1J 0DA, Royaume-Uni</p>
+        <p>Adresse de Contact: stubborn@blabla.com</p>
+    </footer>
     </body>
 </html>
