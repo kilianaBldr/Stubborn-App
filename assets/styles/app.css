@@ -84,6 +84,9 @@ nav a.active {
     text-decoration: underline; 
 } 
 button, button a{ 
+    
+    justify-content: center;
+    align-items: center;
     background-color: #67BAFF; 
     border-color: #67BAFF; color: white; 
     border-radius: 5%; 
