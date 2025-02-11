@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello SweatshirtController!{% endblock %}
+
+{% block body %}
+ {{ form_start(addForm) }}
+        {{ form_row(addForm.name) }}
+        {{ form_row(addForm.price) }}
+        {{ form_row(addForm.StockXS) }}
+        {{ form_row(addForm.stockS) }}
+        {{ form_row(addForm.stockM) }}
+        {{ form_row(addForm.stockL) }}
+        {{ form_row(AddForm.stockXL) }}
+        {{ form_row(AddForm.imageFile) }}
+        {{ form_row(AddForm.isFeatured) }}
+        <button type="submit">Ajouter</button>
+    {{ form_end(addForm) }}
+{% endblock %}

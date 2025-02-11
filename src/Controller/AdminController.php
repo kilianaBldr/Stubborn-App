@@ -1,22 +1,93 @@
 <?php
 
+// src/Controller/AdminController.php 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
+use App\Entity\Sweatshirt; 
+use App\Form\SweatshirtType; 
+use App\Repository\SweatshirtRepository;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController; 
+use Symfony\Component\HttpFoundation\Request; 
+use Symfony\Component\HttpFoundation\File\Exception\FileException; 
+use Symfony\Component\Routing\Annotation\Route; 
+use Symfony\Component\HttpFoundation\Response; 
+use Doctrine\ORM\EntityManagerInterface;
 
 #[IsGranted('ROLE_ADMIN')] //Seuls les admin peuvent accèder à ce controller
-class AdminController extends AbstractController
+class AdminController extends AbstractController 
 {
-    #[Route('/admin', name:'admin_dashboard')]
-    public function index(): Response
-    {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
-        
-        return $this->render('admin/dashboard.html.twig', [
-            'controller_name' => 'AdminController',
-        ]);
-    }
-}
+     #[Route('/admin/sweatshirts', name: 'admin_sweatshirts')] 
+     public function manageSweatshirts(SweatshirtRepository $sweatshirtRepository, Request $request, EntityManagerInterface $entityManager) 
+     {
+         // Récupération des sweat-shirts 
+         $sweatshirts = $sweatshirtRepository->findAll(); 
+         // Création du formulaire pour ajouter un sweatshirt 
+         $sweatshirt = new Sweatshirt(); 
+         $form = $this->createForm(SweatshirtType::class, $sweatshirt, [
+            'attr' => ['enctype' => 'multipart/form-data'],
+         ]); 
+         $form->handleRequest($request); 
+         if ($form->isSubmitted() && $form->isValid()) 
+         { 
+            // Traitement de l'image uploadée 
+            $imageFile = $form->get('imageName')->getData(); 
+            if ($imageFile) { 
+                $newFilename = uniqid().'.'.$imageFile->guessExtension(); 
+                try { 
+                    // Déplace le fichier vers le dossier 'uploads' 
+                    $imageFile->move( $this->getParameter('images_directory'), $newFilename );
+                } catch (FileException $e) { 
+                    $this->addFlash('error', 'Erreur lors de l’upload de l’image'); 
+                } 
+                // Enregistre le nom du fichier dans l'entité 
+                $sweatshirt->setImage($newFilename); 
+            } // Sauvegarde dans la base de données 
+            $entityManager = $this->getDoctrine()->getManager(); 
+            $entityManager->persist($sweatshirt); $entityManager->flush(); 
+            // Redirection vers la page d'admin return 
+            $this->redirectToRoute('admin_sweatshirts'); 
+        } 
+        return $this->render('admin/dashboard.html.twig', [ 
+            'form' => $form->createView(), 
+            'sweatshirts' => $sweatshirts, ]); 
+        } 
+        #[Route('/admin/sweatshirt/{id}/edit', name: 'admin_sweatshirt_edit')] 
+        public function editSweatshirt(Sweatshirt $sweatshirt, Request $request) 
+        { 
+            // Création du formulaire de modification 
+            $form = $this->createForm(SweatshirtType::class, $sweatshirt); 
+            $form->handleRequest($request); 
+            if ($form->isSubmitted() && $form->isValid()) { 
+                $imageFile = $form->get('image')->getData(); 
+                if ($imageFile) { 
+                    $newFilename = uniqid().'.'.$imageFile->guessExtension(); 
+                    try { 
+                        $imageFile->move( $this->getParameter('images_directory'), $newFilename ); 
+                    } catch (FileException $e) { 
+                        $this->addFlash('error', 'Erreur lors de l’upload de l’image'); 
+                    } 
+                    $sweatshirt->setImage($newFilename); 
+                }
+                // Mise à jour en base de données 
+                $this->getDoctrine()->getManager()->flush(); 
+                $this->addFlash('success', 'Sweat-shirt mis à jour avec succès'); 
+                return $this->redirectToRoute('admin_sweatshirts'); 
+            } return $this->render('admin/sweatshirt_edit.html.twig', [ 
+                'form' => $form->createView(), 
+                'sweatshirt' => $sweatshirt, ]); 
+            }
+            #[Route('/admin/sweatshirt/{id}/delete', name: 'admin_sweatshirt_delete')] 
+            public function deleteSweatshirt(Sweatshirt $sweatshirt): Response 
+            {
+                // Suppression de l'image 
+                $imagePath = $this->getParameter('images_directory').'/'.$sweatshirt->getImage(); 
+                if (file_exists($imagePath)) {
+                    unlink($imagePath); 
+                }
+                // Suppression du sweatshirt en base de données 
+                $entityManager = $this->getDoctrine()->getManager(); 
+                $entityManager->remove($sweatshirt); 
+                $entityManager->flush(); $this->addFlash('success', 'Sweat-shirt supprimé avec succès'); 
+                return $this->redirectToRoute('admin_sweatshirts'); 
+            } 
+        }

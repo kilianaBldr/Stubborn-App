@@ -1,0 +1,53 @@
+{% extends 'base.html.twig' %} 
+{% block title %}Modifier le Sweat-shirt{% endblock %} 
+{% block body %} 
+    <main>
+        <h1>Modifier le Sweat-shirt</h1> 
+    <form method="post" enctype="multipart/form-data"> 
+        {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
+        <div> 
+            <label>Photo</label>
+            <img id="imageEdit" src="#" alt="Aperçu de l'image" style="display: none; max-width: 200px;"/>
+            {{ form_widget(form.imageName, {'attr': {'onchange':'imageEdit(event)'}}) }} 
+        </div> 
+        <div> 
+            {{ form_label(form.name) }}
+            {{ form_widget(form.name) }} 
+        </div> 
+        <div> 
+            {{ form_label(form.price) }} 
+            {{ form_widget(form.price) }} 
+        </div> 
+        <div> 
+            {{ form_label(form.stockXS) }} 
+            {{ form_widget(form.stockXS) }} 
+        </div>
+        <div> 
+            {{ form_label(form.stockS) }} 
+            {{ form_widget(form.stockS) }} 
+        </div> 
+        <div> 
+            {{ form_label(form.stockM) }} 
+            {{ form_widget(form.stockM) }} 
+        </div> 
+        <div> 
+            {{ form_label(form.stockL) }} 
+            {{ form_widget(form.stockL) }} 
+        </div> 
+        <div> 
+            {{ form_label(form.stockXL) }} 
+            {{ form_widget(form.stockXL) }} 
+        </div> 
+        <div> 
+            {{ form_label(form.isFeatured) }} 
+            {{ form_widget(form.isFeatured) }} 
+        </div> 
+        <button type="submit">Mettre à jour</button> 
+        {{ form_end(form) }} 
+    </form>
+    <br> 
+    <a href="{{ path('dashboard.html.twig') }}">Retour au dashboard</a> 
+
+    <script src="{{ asset('js/imageEdit.js') }}"></script>
+    </main>
+{% endblock %}
