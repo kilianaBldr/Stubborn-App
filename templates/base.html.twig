@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
+        <title>{% block title %}Stubborn{% endblock %}</title>
         <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
         {% block stylesheets %}
         {% endblock %}
@@ -19,26 +19,22 @@
             <figcaption>Don't compromise on your look</figcaption>
         </figure>
         <nav>
-            <ul>
-                <a href="{{ path('app_home') }}">Accueil</a>
+            <a href="{{ path('app_home') }}">Accueil</a>
 
-                {% if not app.user %}
+            {% if not app.user %}
                 <a href="{{ path('app_register') }}">S'inscrire</a>
                 <a href="{{ path('app_login') }}">Se connecter</a>
             
-                {% else %}
+            {% else %}
                 <a href="{{ path('app_home') }}">Boutique</a>
                 <a href="{{ path('app_home') }}">Panier</a>
             
-                {% if 'ROLE_ADMIN' in app.user.roles %}
-                <a href="{{ path('admin_dashboard') }}">Admin</a>
-                {% endif %}
-            
-                    <a href="{{ path('app_logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Se Déconnecter</a>
-                    <form id="logout-form" action="{{ path('app_logout') }}" method="post" style="display: none;" </form>
-                
-                {% endif %}
-            </ul>
+            {% if 'ROLE_ADMIN' in app.user.roles %}
+                <a href="{{ path('admin_sweatshirts') }}">Admin</a>
+            {% endif %}
+                <a href="{{ path('app_logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Se Déconnecter</a>
+                <form id="logout-form" action="{{ path('app_logout') }}" method="post" style="display: none;" </form>
+            {% endif %}
         </nav>
     </header>
 

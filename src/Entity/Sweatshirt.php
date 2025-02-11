@@ -35,7 +35,7 @@ class Sweatshirt
     private ?int $stockM = null;
 
     #[ORM\Column]
-    private ?int $stcokL = null;
+    private ?int $stockL = null;
 
     #[ORM\Column]
     private ?int $stockXL = null;
@@ -118,14 +118,14 @@ class Sweatshirt
         return $this;
     }
 
-    public function getStcokL(): ?int
+    public function getStockL(): ?int
     {
-        return $this->stcokL;
+        return $this->stockL;
     }
 
-    public function setStcokL(int $stcokL): static
+    public function setStockL(int $stcokL): static
     {
-        $this->stcokL = $stcokL;
+        $this->stockL = $stockL;
 
         return $this;
     }
