@@ -26,7 +26,7 @@
                 <a href="{{ path('app_login') }}">Se connecter</a>
             
             {% else %}
-                <a href="{{ path('app_home') }}">Boutique</a>
+                <a href="{{ path('app_products') }}">Boutique</a>
                 <a href="{{ path('app_home') }}">Panier</a>
             
             {% if 'ROLE_ADMIN' in app.user.roles %}

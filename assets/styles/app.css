@@ -38,7 +38,7 @@ footer{
 
 .register{ 
     border: 1px solid black; 
-    width: 15%;
+    padding: 2rem;
     display: flex; 
     flex-direction: column; 
     justify-content: center; 
@@ -65,9 +65,7 @@ nav a{
     font-weight: bold;
     color: black; 
 } 
-img{ 
-    border: 1px solid black; 
-} 
+
 header img { 
     width: 8rem; 
 } 

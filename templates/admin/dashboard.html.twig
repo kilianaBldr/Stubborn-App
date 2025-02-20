@@ -7,15 +7,13 @@
 {% block title %}Gestion des Sweat-shirts{% endblock %} 
 
 {% block body %} 
-<main>
+<div>
 <!-- Formulaire d'ajout d'un sweat-shirt --> 
 <div class="form-edit">
 <form method="post" enctype="multipart/form-data" class="sweatshirt-form"> 
     {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
     <div class="form-groupe">
-        <label>Photo</label>
-        <img id="editImage" src="#" alt="Aperçu de l'image" style="display: none; max-width: 150px; max-height: 150px;"/>
-        {{ form_widget(form.imageName, {'attr': {'onchange':'imageEdit(event)'}})}} 
+        {{ form_row(form.imageFile)}} 
     </div>
     <div class="form-groupe">
         {{ form_label(form.name) }}
@@ -79,6 +77,6 @@
     {% endfor %}
 </section>
     <script src="{{ asset('js/imageEdit.js') }}"></script>
-</main>
+</div>
 
 {% endblock %}

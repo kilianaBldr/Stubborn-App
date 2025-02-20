@@ -10,7 +10,8 @@ use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use symfony\Component\Validator\Constraints\File;
+use Symfony\Component\Validator\Constraints as Assert;
+use Vich\UploaderBundle\Form\Type\VichImageType;
 
 class SweatshirtType extends AbstractType
 {
@@ -39,22 +40,25 @@ class SweatshirtType extends AbstractType
             ->add('stockXL', NumberType::class,[
                 'label' => 'Stock XL',
             ])
-            ->add('imageName', FileType::class,[
-                'label' => 'Image du Sweatshirt (PNG, JPG, JPEG)',
-                'required' => false,
-                'mapped' =>false,
-                'constraints' => [
-                    new File (['maxSize' => '5M',
-                    'mimeTypes' => ['image/jpeg', 'image/png', 'image/jpeg'],
-                    'mimeTypesMessage' => 'Veuillez uploader une image au format JPG ou PNG ou JPEG.',
-                    ])
+            ->add('imageFile', VichImageType::class,[
+                'label' => 'Image du Sweatshirt',
+                'label_attr' =>  [
+                    'class' => 'form-label mt-4'
                 ],
             ])
             ->add('isFeatured', CheckboxType::class, [
-                'required' => 'false',
-                'label' => 'Mettre en avant',
-            ])
-        ;
+                'attr' => [
+                    'class' => 'form-check-input',
+                ],
+                'required' => false, //n'est pas obligatoire
+                'label' => 'Mettre en avant ?',
+                'label_attr' => [
+                'class' => 'form-check-label'
+            ],
+            'constraints' => [
+                new Assert\NotNull() //Empêche une valeurs null (doit etre tree ou false)
+            ]
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
