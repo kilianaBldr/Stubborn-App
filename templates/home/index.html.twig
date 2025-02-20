@@ -1,7 +1,24 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Boutique{% endblock %}
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/home.css') }}">
+{% endblock %}
+
+{% block title %}Accueil{% endblock %}
 
 {% block body %}
-<h1>Bienvenue sur la Boutiques</h1>
+<section class="homepage">
+    <div class="container" style="display: flex; justify-content: space-evenly;">
+        {% for sweatshirt in featuredSweatshirts %}
+            <div class="product-card">
+                <img src="{{ asset('uploads/images/sweatshirts/' ~ sweatshirt.imageName) }}" alt="{{ sweatshirt.name }}">
+                <h2>{{ sweatshirt.name }}</h2>
+                <p>Prix : {{ sweatshirt.price }}€</p>
+                <button><a href="{{ path('sweatshirt_detail', {'id': sweatshirt.id}) }}">Voir</a></button>
+            </div>
+        {% else %}
+            <p>Auncun produit mis en avant pour le moment.</p>
+        {% endfor %}
+    </div>
+</section>
 {% endblock %}

@@ -1,14 +1,14 @@
 {% extends 'base.html.twig' %} 
 {% block title %}Modifier le Sweat-shirt{% endblock %} 
 {% block body %} 
-    <main>
-        <h1>Modifier le Sweat-shirt</h1> 
+<div>
+    <h1>Modifier le Sweat-shirt</h1> 
     <form method="post" enctype="multipart/form-data"> 
         {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
         <div> 
             <label>Photo</label>
-            <img id="imageEdit" src="#" alt="Aperçu de l'image" style="display: none; max-width: 200px;"/>
-            {{ form_widget(form.imageName, {'attr': {'onchange':'imageEdit(event)'}}) }} 
+            <img id="editImage" src="#" alt="Aperçu de l'image" style="display: none; max-width: 200px;"/>
+            {{ form_widget(form.imageFile, {'attr': {'onchange':'imageEdit(event)'}}) }} 
         </div> 
         <div> 
             {{ form_label(form.name) }}
@@ -49,5 +49,5 @@
     <a href="{{ path('dashboard.html.twig') }}">Retour au dashboard</a> 
 
     <script src="{{ asset('js/imageEdit.js') }}"></script>
-    </main>
+</div>
 {% endblock %}

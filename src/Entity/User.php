@@ -8,17 +8,32 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
-#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
-#[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
+#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_NAME', fields: ['name'])]
+#[UniqueEntity(fields: ['name'], message: 'Ce nom d\'utilisateur est déja utilisé')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
+
+    #[ORM\Column(type: 'datetime_immutable')]
+    #[Assert\NotNull()]
+    private ?\DateTimeImmutable $createdAt;
+
+    #[ORM\Column(type: 'datetime_immutable')]
+    #[Assert\NotNull()]
+    private ?\DateTimeImmutable $updatedAt;
+
+    #[ORM\Column(length: 180, unique: true)]
+    #[Assert\NotBlank]
+    private ?string $name = null;
 
     #[ORM\Column(length: 180)]
     private ?string $email = null;
@@ -33,10 +48,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var string The hashed password
      */
     #[ORM\Column]
+    #[Assert\NotBlank]
     private ?string $password = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $name = null;
+    #[Assert\EqualTo(propertyPath: "password", message: "The password and confirmation password must match.")]
+    private $confirmPassword;
+
 
     #[ORM\Column(type: Types::TEXT)]
     private ?string $delivery_address = null;
@@ -46,6 +63,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function __construct()
     {
+        $this->createdAt = new \DateTimeImmutable();
+        $this->updatedAt = new \DateTimeImmutable();
         //Assigne automatiquement le role ROLE_USER à chauque nouvel utilisateur 
         $this->roles = ['ROLE_USER'];
     }
@@ -53,6 +72,46 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function setCreatedAt(?\DateTimeImmutable $createdAt): self
+    {
+        $this->createdAt = $createdAt;
+        return $this; 
+    } 
+
+
+    public function getCreatedAt(): ?\DateTimeImmutable 
+    { 
+        return $this->createdAt; 
+    } 
+    
+    public function getUpdatedAt(): ?\DateTimeImmutable 
+    { 
+        return $this->updatedAt; 
+    } 
+    
+    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): self 
+    { 
+        $this->updatedAt = $updatedAt; 
+        return $this; 
+    }
+
+    public function updateTimestamp(): void 
+    { 
+        $this->updatedAt = new \DateTimeImmutable();
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): static
+    {
+        $this->name = $name;
+
+        return $this;
     }
 
     public function getEmail(): ?string
@@ -74,7 +133,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getUserIdentifier(): string
     {
-        return (string) $this->email;
+        return (string) $this->name;
     }
 
     /**
@@ -116,14 +175,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getName(): ?string
+    public function getConfirmPassword(): ?string
     {
-        return $this->name;
+        return $this->confirmPassword;
     }
 
-    public function setName(string $name): static
+    public function SetConfirmPassword(string $confirmPassword): static
     {
-        $this->name = $name;
+        $this->confirmPassword = $confirmPassword;
 
         return $this;
     }
