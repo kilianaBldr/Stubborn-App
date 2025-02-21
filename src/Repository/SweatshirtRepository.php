@@ -26,13 +26,14 @@ class SweatshirtRepository extends ServiceEntityRepository
         ->getResult();
     }
 
-//    public function findOneBySomeField($value): ?Sweatshirt
-//    {
-//        return $this->createQueryBuilder('s')
-//            ->andWhere('s.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    public function  findByPriceRange(float $minPrice, float $maxPrice)
+    {
+        return $this->createQueryBuilder('s')
+        ->andWhere('s.price >= :minPrice')
+        ->andWhere('s.price <= :maxPrice')
+        ->setParameter('minPrice', $minPrice)
+        ->setParameter('maxPrice', $maxPrice)
+        ->setQuery()
+        ->getResult();
+    }
 }

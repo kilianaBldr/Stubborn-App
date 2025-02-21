@@ -1,37 +1,56 @@
 {% extends 'base.html.twig' %}
 
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/products.css') }}">
+{% endblock %}
+
 {% block title %}Boutique{% endblock %}
 
 {% block body %}
-<div>
+<div class="boutique">
     <section class="filter">
-        <form method="GET" action="{{ path('app_products') }}">
-        <label for="price_filter">Fouchette de prix :</label>
-        <select id="price_filter" name="price_filter" onchange="this.form.submit()">
-            <option value="all" {% if priceFilter == 'all' %}selected{% endif %}>Tous</option>
-            <option value="10-29" {% if priceFilter == '10-29' %}selected{% endif %}>10 à 29 €</option>
-            <option value="29-35" {% if priceFilter == '29-35' %}selected{% endif %}>29 à 35 €</option>
-            <option value="35-50" {% if priceFilter == '35-50' %}selected{% endif %}>35 à 50 €</option>
+        <label for="priceFilter">Filtrer par prix</label>
+        <select id="priceFilter" class="price">
+            <option value="10-29">10€ - 29€</option>
+            <option value="29-35">29€ - 35€</option>
+            <option value="35-50">35€ - 50€</option>
         </select>
-    </form>
     </section>
+    
     <!-- Liste des Sweatshirts -->
-
     <section class="shop">
         {% if sweatshirts is not empty %}
             {% for sweatshirt in sweatshirts %}
-                <article class="sweatshirt">
+                <div class="sweatshirt">
                     {% if sweatshirt.imageName %}
                         <img src="{{ asset('uploads/images/sweatshirts/' ~ sweatshirt.imageName) }}" alt="{{ sweatshirt.name }}" width="150">
                     {% endif %}
+                    <div>
                     <h2>{{ sweatshirt.name}}</h2>
-                    <p>Prix : {{ sweatshirt.price }}€</p>
+                    <p>Prix : {{ sweatshirt.price }} €</p>
+                    </div>
                     <button><a href="{{ path('sweatshirt_detail', {'id': sweatshirt.id}) }}">Voir</a></button>
-                </article>
+                </div>
             {% endfor %}
         {% else %}
             <p>Ancun produit trouvé pour cette fourchette de prix.</p>
         {% endif %}
     </section>
+
+    <script>
+        document.getElementById('priceFilter').addEventListener('change', function () {
+            let selectedValue = this.value;
+            let url = new URL(window.location.href);
+            if (selectedValue) {
+                let [minPrice, maxPrice] = selectedValue.split('-');
+                url.searchParams.set('minPrice', minPrice);
+                url.searchParams.set('maxPrice', maxPrice);
+            } else {
+                url.searchParams.delete('minPrice');
+                url.searchParams.delete('maxPrice');
+            }
+            window.location.href = url.toString();
+        });
+    </script>
 
 {% endblock %}
