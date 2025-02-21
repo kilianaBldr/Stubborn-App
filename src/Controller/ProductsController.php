@@ -3,8 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\Sweatshirt;
+use App\Repository\SweatshirtRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\Request; 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -12,29 +14,28 @@ use Symfony\Component\Routing\Attribute\Route;
 final class ProductsController extends AbstractController
 {
     #[Route('/products', name: 'app_products')]
-    public function index(Request $request, EntityManagerInterface $entityManager): Response
-    {   
-        //Récupération du filtre Prix (par default: 'all')
-        $priceFilter = $request->query->get('price_filter', 'all');
-       
-        //Création de la requete 
-        $queryBuilder = $entityManager->getRepository(Sweatshirt::class)->createQueryBuilder('s');
+    public function index(Request $request, SweatshirtRepository $sweatshirtRepository): Response
+    {
+        // Récupération des valeurs du filtre depuis l'URL
+        $minPrice = $request->query->get('minPrice');
+        $maxPrice = $request->query->get('maxPrice');
 
-            //Si un filtre de prix est appliqué, on ajoute les conditions a la requete 
-            if($priceFilter !== 'all') {
-                [$minPrice, $maxPrice] = explode('-', $priceFilter);
-                $queryBuilder->where('s.price BETWEEN :min AND :max')
-                ->setParameter('min', (int)$minPrice)
-                ->setParameter('max', (int)$maxPrice);
-            }
+        // Création de la requête dynamique
+        $query = $sweatshirtRepository->createQueryBuilder('s');
 
-            //Execution de la requete 
-            $sweatshirts = $queryBuilder->getQuery()->getResult();
-            
-            //Rendu de la page Twig avec les sweatshirts  filtré et le filtre de prix
-            return $this->render('products/index.html.twig', [
-                'sweatshirts' => $sweatshirts,
-                'priceFilter' => $priceFilter,
-            ]);
+        if ($minPrice !== null && $maxPrice !== null) {
+            $query->where('s.price BETWEEN :minPrice AND :maxPrice')
+                  ->setParameter('minPrice', $minPrice)
+                  ->setParameter('maxPrice', $maxPrice);
         }
+
+        $sweatshirts = $query->getQuery()->getResult();
+
+        // Vérification des produits récupérés
+        // dd($sweatshirts); // Active cette ligne pour déboguer si besoin
+
+        return $this->render('products/index.html.twig', [
+            'sweatshirts' => $sweatshirts,
+        ]);
     }
+}

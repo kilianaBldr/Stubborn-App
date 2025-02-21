@@ -1,0 +1,39 @@
+.boutique {
+    display: flex;
+    justify-content: center;
+    
+}
+
+.filter {
+    display: flex;
+    flex-direction: column;
+    width: 20%;
+    height: 40%;
+}
+.price {
+    width: 60%;
+    text-align: center;
+}
+
+.shop {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.sweatshirt {
+    margin: 2rem;
+    padding: 3rem;
+    border: 1px solid black;
+    text-align: center;
+}
+button {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    border: 1px solid black;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin-top: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
