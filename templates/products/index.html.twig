@@ -2,39 +2,48 @@
 
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset('css/products.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 {% endblock %}
 
 {% block title %}Boutique{% endblock %}
 
 {% block body %}
-<div class="boutique-container">
-    <aside class="filter">
-        <h3>Filtrer par prix</h3>
-        <select id="priceFilter">
-            <option value="all">Tous les sweatshirts</option>
-            <option value="10-29">10€ - 29€</option>
-            <option value="29-35">29€ - 35€</option>
-            <option value="35-50">35€ - 50€</option>
-        </select>
-    </aside>
-    
-    <!-- Liste des Sweatshirts -->
-    <section class="products">
-            {% for sweatshirt in sweatshirts %}
-                <div class="products-cart">
-                    <div class="products-image">
-                        {% if sweatshirt.imageName %}
-                            <img src="{{ asset('uploads/images/sweatshirts/' ~ sweatshirt.imageName) }}" alt="{{ sweatshirt.name }}" width="150">
-                        {% endif %}
+<div class="container mt-5">
+    <h1 class="mb-4 text-center">Boutique</h1>
+
+    <div class="row d-flex justify-content-around">
+        <!-- Colonne pour le filtre -->
+        <div class="col-md-2">
+            <h5>Fourchette de prix</h5>
+            <select id="priceFilter" class="form-select">
+                <option value="all">Sweatshirts</option>
+                <option value="10-29">10€ - 29€</option>
+                <option value="29-35">29€ - 35€</option>
+                <option value="35-50">35€ - 50€</option>
+            </select>
+        </div>
+
+        <!-- Colonne pour la liste des produits -->
+        <div class="col-md-6">
+            <div class="row">
+                {% for sweatshirt in sweatshirts %}
+                    <div class="col-md-5 mb-4 ">
+                        <div class="card shadow-sm ">
+                            {% if sweatshirt.imageName %}
+                                <img src="{{ asset('uploads/images/sweatshirts/' ~ sweatshirt.imageName) }}" class="card-img-top" alt="{{ sweatshirt.name }}">
+                            {% endif %}
+                            <div class="card-body text-center">
+                                <h5 class="card-title">{{ sweatshirt.name }}</h5>
+                                <p class="card-text"><strong>{{ sweatshirt.price }} €</strong></p>
+                                <a href="{{ path('sweatshirt_detail', {'id': sweatshirt.id}) }}" class="btn btn-primary">Voir</a>
+                            </div>
+                        </div>
                     </div>
-                    <div class="products-info">
-                    <p>{{ sweatshirt.name}}</p>
-                    <p>Prix : {{ sweatshirt.price }} €</p>
-                    <a href="{{ path('sweatshirt_detail', {'id': sweatshirt.id}) }}" class="btn">VOIR</a>
-                    </div>
-                </div>
-            {% endfor %}
-    </section>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
 
     <script>
         document.getElementById('priceFilter').addEventListener('change', function () {

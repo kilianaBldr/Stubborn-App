@@ -1,20 +1,44 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello CartController!{% endblock %}
+{% block title %}Panier - Stubborn{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+<div class="container mt-5">
+    <h1 class="mb-4">Panier</h1>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+    {% if cart is empty %}
+        <p>Votre panier est vide.</p>
+    {% else %}
+        <div class="card p-3">
+            {% for item in cart %}
+                <div class="row align-items-center border-bottom py-3">
+                {% if item.sweatshirt.imageName %}
+                    <div class="col-md-2">
+                        <img src="{{ asset('uploads/images/sweatshirts/' ~ item.sweatshirt.imageName) }}" class="rounded float-start" alt="{{ item.sweatshirt.name }}">
+                    </div>
+                {% endif %}
+                    <div class="col-md-6 d-flex align-items-center justify-content-between">
+                        <h5>{{ item.sweatshirt.name }}</h5>
+                        <p class="mb-1">Prix : <strong>{{ item.sweatshirt.price }} €</strong></p>
+                        <p class="mb-1">Taille : {{ item.size }}</p>
+                        <p class="mb-1">Quantité : {{ item.quantity }}</p>
+                    </div>
+                    <div class="col-md-4 text-md-end">
+                        <a href="{{ path('cart_remove', {'id': item.sweatshirt.id, 'size': item.size}) }}" class="btn btn-outline-danger">
+                            Retirer du panier
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>C:/Users/kilia/Stubborn-App/src/Controller/CartController.php</code></li>
-        <li>Your template at <code>C:/Users/kilia/Stubborn-App/templates/cart/index.html.twig</code></li>
-    </ul>
+        <div class="d-flex justify-content-between align-items-center mt-4">
+            <h4 >Total : <strong>{{ total }} €</strong></h4>
+            <div>
+                <a href="{{ path('app_home') }}" class="btn btn-danger">Finaliser ma commande</a>
+                <a href="{{ path('app_products') }}" class="btn btn-success">Continuer mes achats</a>
+            </div>
+        </div>
+    {% endif %}
 </div>
 {% endblock %}

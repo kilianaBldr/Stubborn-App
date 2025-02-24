@@ -1,8 +1,8 @@
+{% extends 'base.html.twig' %} 
+
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset('css/sweatshirtDetail.css') }}">
 {% endblock %}
-
-{% extends 'base.html.twig' %} 
 
 {% block title %}Détail du Sweatshirt{% endblock %} 
 
@@ -11,54 +11,38 @@
         <div class="image-detail">
             <img src="{{ asset('uploads/images/sweatshirts/' ~ sweatshirt.imageName) }}" alt="{{ sweatshirt.name }}" class="sweatshirt-image">
         </div>
-            <!-- info du sweatshirt -->
-            <div class="sweatshirt-info"> 
-                <h1>{{ sweatshirt.name }}</h1>
-                <p>Prix : {{ sweatshirt.price }} €</p>
+        <!-- info du sweatshirt -->
+        <div class="sweatshirt-info"> 
+            <h1>{{ sweatshirt.name }}</h1>
+            <p>Prix : {{ sweatshirt.price }} €</p>
 
-                <!-- selectionne une taille -->
-                    <form action="{{ path('cart_add', { id: sweatshirt.id, size: 'M' }) }}" method="POST">
-                        <label for="size">Taille :</label>
-                        <select name="size" id="size">ù
-                            <option value="XS">XS</option>
-                            <option value="S">S</option>
-                            <option value="M">M</option>
-                            <option value="L">L</option>
-                            <option value="XL">XL</option>
-                        </select>
-                        <button type="submit">Ajouter au panier</button>
-                    </form>
-                    {% if sweatshirt.stock > 0 %}
-                        <p class="out-of-stock">Cet article est en ruture de stock.</p>
-                    {% else %}
-                        <p class="out-of-stock">Cet article est en ruture de stock.</p>
-                    {% endif %}
+            <!-- selectionne une taille -->
+            <form method="post" action="{{ path('cart_add', { id: sweatshirt.id }) }}">
+            <label for="size">Taille :</label>
+            <select name="size" id="size">
+                {% if sweatshirt.stockXS > 0 %}
+                    <option value="XS">XS</option>
+                {% endif %}
+                {% if sweatshirt.stockS > 0 %}
+                    <option value="S">S</option>
+                {% endif %}
+                {% if sweatshirt.stockM > 0 %}
+                    <option value="M">M</option>
+                {% endif %}
+                {% if sweatshirt.stockL > 0 %}
+                    <option value="L">L</option>
+                {% endif %}
+                {% if sweatshirt.stockXL > 0 %}
+                    <option value="XL">XL</option>
+                {% endif %}
+            </select>
+                <button type="submit">Ajouter au panier</button>
+         
+            </form>
+            <a href="{{ path('app_products')}}" class="btn">Retour à la boutique</a>
+        </div>
+    </div>
 
-
-                    <a href="{{ path('app_products')}}" class="btn">Retour à la boutique</a>
-
-
-                    <script>
-                        document.getElementById('addToCart').addEventListener('click', function() {
-                        let selectedSize = document.getElementById('size').value;
-
-                        if (!selectedSize) {
-                            alert('Veuillez sélectionner une taille.');
-                            return;
-                        }
-
-                        let url = '{{ path('cart_add', { id: sweatshirt.id }) }}' + '?size=' + selectedSize;
-
-                        fetch(url, { method: 'POST' })
-                        .then(response => response.json())
-                        .then(data => {
-                        if (data.success) {
-                            alert('Ajouté au panier avec succès !');
-                        } else {
-                            alert('Erreur lors de l\'ajout au panier.');
-                        }
-                    });
-                });
-</script>
+    
                 
 {% endblock %}
