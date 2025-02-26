@@ -94,8 +94,8 @@
                                 </p>
                             </div>
                             <div class="col-md-2 d-flex flex-column gap-2 p-3">
-                                <a href="{{ path('app_sweatshirt_edit', {'id': sweatshirt.id}) }}" class="btn btn-warning btn-sm">Modifier</a>
-                                <form action="{{ path('app_sweatshirt_delete', {'id': sweatshirt.id}) }}" method="post">
+                                <a href="{{ path('admin_sweatshirt_edit', {'id': sweatshirt.id}) }}" class="btn btn-warning btn-sm">Modifier</a>
+                                <form action="{{ path('admin_sweatshirt_delete', {'id': sweatshirt.id}) }}" method="post">
                                     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ sweatshirt.id) }}">
                                     <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce sweatshirt ?');">Supprimer</button>
                                 </form>
