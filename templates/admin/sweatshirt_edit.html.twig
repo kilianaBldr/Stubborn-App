@@ -1,53 +1,79 @@
-{% extends 'base.html.twig' %} 
-{% block title %}Modifier - {{ sweatshirt.name }}{% endblock %} 
-{% block body %} 
-<div>
-    <h1>Modifier le Sweat-shirt</h1> 
-    <form method="post" enctype="multipart/form-data"> 
-        {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
-        <div> 
-            <label>Photo</label>
-            <img id="editImage" src="#" alt="Aperçu de l'image" style="display: none; max-width: 200px;"/>
-            {{ form_widget(form.imageFile, {'attr': {'onchange':'imageEdit(event)'}}) }} 
-        </div> 
-        <div> 
-            {{ form_label(form.name) }}
-            {{ form_widget(form.name) }} 
-        </div> 
-        <div> 
-            {{ form_label(form.price) }} 
-            {{ form_widget(form.price) }} 
-        </div> 
-        <div> 
-            {{ form_label(form.stockXS) }} 
-            {{ form_widget(form.stockXS) }} 
-        </div>
-        <div> 
-            {{ form_label(form.stockS) }} 
-            {{ form_widget(form.stockS) }} 
-        </div> 
-        <div> 
-            {{ form_label(form.stockM) }} 
-            {{ form_widget(form.stockM) }} 
-        </div> 
-        <div> 
-            {{ form_label(form.stockL) }} 
-            {{ form_widget(form.stockL) }} 
-        </div> 
-        <div> 
-            {{ form_label(form.stockXL) }} 
-            {{ form_widget(form.stockXL) }} 
-        </div> 
-        <div> 
-            {{ form_label(form.isFeatured) }} 
-            {{ form_widget(form.isFeatured) }} 
-        </div> 
-        <button type="submit">Mettre à jour</button> 
-        {{ form_end(form) }} 
-    </form>
-    <br> 
-    <a href="{{ path('dashboard.html.twig') }}">Retour au dashboard</a> 
+{% extends 'base.html.twig' %}
 
-    <script src="{{ asset('js/imageEdit.js') }}"></script>
+{% block title %}Modifier - {{ sweatshirt.name }}{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <h1 class="text-center mb-4">Modifier le Sweat-shirt</h1>
+
+    <form method="post" enctype="multipart/form-data" class="card p-3 shadow-sm">
+        {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
+
+        <div class="row align-items-center">
+            <!-- Aperçu de l'image -->
+            <div class="col-md-2 text-center">
+                {% if sweatshirt.imageName %}
+                    <img id="editImage" src="{{ asset('uploads/images/sweatshirts/' ~ sweatshirt.imageName) }}" 
+                         alt="Image actuelle" class="img-fluid rounded shadow">
+                {% else %}
+                    <img id="editImage" src="#" alt="Aperçu de l'image" style="display: none; max-width: 100px;">
+                {% endif %}
+                {{ form_widget(form.imageFile, {'attr': {'onchange':'imageEdit(event)', 'class': 'form-control mt-2'}}) }}
+            </div>
+
+            <!-- Champs du formulaire -->
+            <div class="col-md-2">
+                <label class="fw-bold">Nom</label>
+                {{ form_widget(form.name, {'attr': {'class': 'form-control'}}) }}
+            </div>
+
+            <div class="col-md-2">
+                <label class="fw-bold">Prix (€)</label>
+                {{ form_widget(form.price, {'attr': {'class': 'form-control'}}) }}
+            </div>
+
+            <div class="col-md-1">
+                <label class="fw-bold">Stock XS</label>
+                {{ form_widget(form.stockXS, {'attr': {'class': 'form-control'}}) }}
+            </div>
+
+            <div class="col-md-1">
+                <label class="fw-bold">Stock S</label>
+                {{ form_widget(form.stockS, {'attr': {'class': 'form-control'}}) }}
+            </div>
+
+            <div class="col-md-1">
+                <label class="fw-bold">Stock M</label>
+                {{ form_widget(form.stockM, {'attr': {'class': 'form-control'}}) }}
+            </div>
+
+            <div class="col-md-1">
+                <label class="fw-bold">Stock L</label>
+                {{ form_widget(form.stockL, {'attr': {'class': 'form-control'}}) }}
+            </div>
+
+            <div class="col-md-1">
+                <label class="fw-bold">Stock XL</label>
+                {{ form_widget(form.stockXL, {'attr': {'class': 'form-control'}}) }}
+            </div>
+
+            <div class="col-md-1">
+                <label class="fw-bold">En avant</label>
+                {{ form_widget(form.isFeatured) }}
+            </div>
+
+            <div class="col-md-2 mt-3">
+                <button type="submit" class="btn btn-success w-100">Mettre à jour</button>
+            </div>
+        </div>
+
+        {{ form_end(form) }}
+    </form>
+
+    <div class="mt-3">
+        <a href="{{ path('admin_sweatshirts') }}" class="btn btn-secondary">Retour au dashboard</a>
+    </div>
 </div>
+
+<script src="{{ asset('js/imageEdit.js') }}"></script>
 {% endblock %}
