@@ -61,7 +61,7 @@ class AdminController extends AbstractController
             } 
             $entityManager->flush(); 
             $this->addFlash('success', 'Sweat-shirt mis à jour avec succès'); 
-            return $this->redirectToRoute('admin_sweatshirts'); 
+            return $this->redirectToRoute('app_products'); 
         } 
         return $this->render('admin/sweatshirt_edit.html.twig', [ 
             'form' => $form->createView(), 

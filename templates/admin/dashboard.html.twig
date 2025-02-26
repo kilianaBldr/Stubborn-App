@@ -1,82 +1,112 @@
 {% extends 'base.html.twig' %}
 
-{% block stylesheets %}
-    <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
-{% endblock %}
-
-{% block title %}Gestion des Sweat-shirts{% endblock %} 
+{% block title %}Gestion des Sweat-shirts{% endblock %}
 
 {% block body %} 
-<div>
-<!-- Formulaire d'ajout d'un sweat-shirt --> 
-<div class="form-edit">
-<form method="post" enctype="multipart/form-data" class="sweatshirt-form"> 
-    {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
-    <div class="form-groupe">
-        {{ form_row(form.imageFile)}} 
-    </div>
-    <div class="form-groupe">
-        {{ form_label(form.name) }}
-        {{ form_widget(form.name, {'attr': {'class': 'form-control'}}) }} 
-    </div>  
-    <div class="form-groupe">
-        {{ form_label(form.price) }} 
-        {{ form_widget(form.price, {'attr': {'class': 'form-control'}}) }} 
-    </div> 
-    <div class="form-groupe">
-        {{ form_label(form.stockXS) }}
-        {{ form_widget(form.stockXS, {'attr': {'class': 'form-control'}}) }} 
-    </div> 
-    <div class="form-groupe">
-        {{ form_label(form.stockS) }}
-        {{ form_widget(form.stockS, {'attr': {'class': 'form-control'}}) }} 
-    </div> 
-    <div class="form-groupe">
-        {{ form_label(form.stockM) }} 
-        {{ form_widget(form.stockM, {'attr': {'class': 'form-control'}}) }} 
-    </div> 
-    <div class="form-groupe">
-        {{ form_label(form.stockL) }} 
-        {{ form_widget(form.stockL, {'attr': {'class': 'form-control'}}) }} 
-    </div> 
-    <div class="form-groupe">
-        {{ form_label(form.stockXL) }} 
-        {{ form_widget(form.stockXL, {'attr': {'class': 'form-control'}}) }} 
-    </div> 
-    <div class="form-groupe">
-        {{ form_label(form.isFeatured) }}
-        {{ form_widget(form.isFeatured, {'attr': {'class': 'form-check-input'}}) }}
-    </div> 
-        <button type="submit" class="btn btn-primary">Ajouter</button> 
-    {{ form_end(form) }} 
-</form> 
-</div>
-<!-- Liste des sweat-shirts -->  
-<section class="product-list"> 
-    {% for sweatshirt in sweatshirts %}
-        <article class="product-item">
-            {% if sweatshirt.imageName %}
-                <img src="{{ asset('uploads/images/sweatshirts/' ~ sweatshirt.imageName) }}" style="max-width: 200px; max-height: 200px;" alt="{{ sweatshirt.name }}"/> 
-            {% endif %} 
-            <h3>{{ sweatshirt.name }}</h3> 
-            <p>Prix: {{ sweatshirt.price }} €</p> 
-            <p>Stock XS: {{ sweatshirt.stockXS }}</p> 
-            <p>Stock S: {{ sweatshirt.stockS }}</p> 
-            <p>Stock M: {{ sweatshirt.stockM }}</p> 
-            <p>Stock L: {{ sweatshirt.stockL }}</p> 
-            <p>Stock XL: {{ sweatshirt.stockXl }}</p> 
-            
-            <button class="btn">
-                <a href="{{ path('app_sweatshirt_edit', {'id': sweatshirt.id}) }}" class="btn btn-edit">Modifier</a>
-            </button>
-            <form action="{{ path('app_sweatshirt_delete', {'id': sweatshirt.id}) }}" method="post" style="display:inline;">
-                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ sweatshirt.id) }}"> 
-                <button type="submit" class="btn btn-delete" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce sweatshirt ?');">Supprimer</button>
-            </form>
-        </article>
-    {% endfor %}
-</section>
-    <script src="{{ asset('js/imageEdit.js') }}"></script>
+<div class="container mt-5">
+    <h2 class="text-center fw-bold mb-4">Back-Office</h2>
+
+    <!-- Formulaire d'ajout d'un sweat-shirt en ligne -->
+<div class="card shadow mb-4 p-4 bg-light">
+    <h4 class="mb-3 text-center fw-bold">Ajouter un Sweat-shirt</h4>
+    <form method="post" enctype="multipart/form-data">
+        {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
+
+        <div class="row align-items-end g-2">
+            <div class="col-md-2">
+                {{ form_label(form.imageFile, "Image", {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                {{ form_widget(form.imageFile, {'attr': {'class': 'form-control'}}) }}
+            </div>
+
+            <div class="col-md-2">
+                {{ form_label(form.name, "Nom", {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                {{ form_widget(form.name, {'attr': {'class': 'form-control'}}) }} 
+            </div>
+
+            <div class="col-md-1">
+                {{ form_label(form.price, "Prix", {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                {{ form_widget(form.price, {'attr': {'class': 'form-control'}}) }} 
+            </div>
+
+            <div class="col-md-1">
+                {{ form_label(form.stockXS, "Stock XS", {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                {{ form_widget(form.stockXS, {'attr': {'class': 'form-control'}}) }} 
+            </div>
+
+            <div class="col-md-1">
+                {{ form_label(form.stockS, "Stock S", {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                {{ form_widget(form.stockS, {'attr': {'class': 'form-control'}}) }} 
+            </div>
+
+            <div class="col-md-1">
+                {{ form_label(form.stockM, "Stock M", {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                {{ form_widget(form.stockM, {'attr': {'class': 'form-control'}}) }} 
+            </div>
+
+            <div class="col-md-1">
+                {{ form_label(form.stockL, "Stock L", {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                {{ form_widget(form.stockL, {'attr': {'class': 'form-control'}}) }} 
+            </div>
+
+            <div class="col-md-1">
+                {{ form_label(form.stockXL, "Stock XL", {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                {{ form_widget(form.stockXL, {'attr': {'class': 'form-control'}}) }} 
+            </div>
+             <div class="col-md-1 form-check">
+                {{ form_widget(form.isFeatured, {'attr': {'class': 'form-check-input'}}) }}
+                {{ form_label(form.isFeatured, "Mettre en avant", {'label_attr': {'class': 'form-check-label'}}) }}
+                </div>
+
+            <div class="col-md-1 text-center">
+                <button type="submit" class="btn btn-primary w-100 d-flex align-item-center">Ajouter</button>
+            </div>
+        </div>
+
+        {{ form_end(form) }}
+    </form>
 </div>
 
+    <!-- Liste des sweat-shirts -->
+    <section class="mt-4">
+        <h4 class="text-center mb-3">Liste des Sweat-shirts</h4>
+        <div class="row">
+            {% for sweatshirt in sweatshirts %}
+                <div class="col-md-12">
+                    <div class="card mb-3 shadow">
+                        <div class="row g-0 align-items-center">
+                            <div class="col-md-2 text-center">
+                                {% if sweatshirt.imageName %}
+                                    <img src="{{ asset('uploads/images/sweatshirts/' ~ sweatshirt.imageName) }}" 
+                                         class="img-fluid rounded" 
+                                         alt="{{ sweatshirt.name }}" 
+                                         style="max-width: 100px;">
+                                {% endif %}
+                            </div>
+                            <div class="col-md-8 p-3">
+                                <h5 class="fw-bold">{{ sweatshirt.name }}</h5>
+                                <p>Prix : <strong>{{ sweatshirt.price }} €</strong></p>
+                                <p>
+                                    Stock XS: {{ sweatshirt.stockXS }} | 
+                                    Stock S: {{ sweatshirt.stockS }} | 
+                                    Stock M: {{ sweatshirt.stockM }} | 
+                                    Stock L: {{ sweatshirt.stockL }} | 
+                                    Stock XL: {{ sweatshirt.stockXL }}
+                                </p>
+                            </div>
+                            <div class="col-md-2 d-flex flex-column gap-2 p-3">
+                                <a href="{{ path('app_sweatshirt_edit', {'id': sweatshirt.id}) }}" class="btn btn-warning btn-sm">Modifier</a>
+                                <form action="{{ path('app_sweatshirt_delete', {'id': sweatshirt.id}) }}" method="post">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ sweatshirt.id) }}">
+                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce sweatshirt ?');">Supprimer</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+
+<script src="{{ asset('js/imageEdit.js') }}"></script>
 {% endblock %}
