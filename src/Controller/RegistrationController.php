@@ -3,53 +3,69 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use \DateTime;
+use App\Service\MailerService;
 use App\Form\RegistrationFormType;
 use App\Repository\UserRepository;
-use App\Security\EmailVerifier;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Mime\Address;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Security\Http\Authentication\UserAuthenticatorInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use App\Security\UserAuthenticator;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Contracts\Translation\TranslatorInterface;
-use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
+use Symfony\Component\Uid\Uuid;
 
 class RegistrationController extends AbstractController
 {
-    public function __construct(private EmailVerifier $emailVerifier)
-    {
-    }
-
     #[Route('/register', name: 'app_register')]
-    public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $entityManager): Response
-    {
+    public function register(
+        Request $request, 
+        UserPasswordHasherInterface $userPasswordHasher, 
+        EntityManagerInterface $entityManager,
+        MailerService $mailerService
+    ): Response {
         $user = new User();
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            /** @var string $plainPassword */
-            $password = $form->get('password')->getData();
+            // Générer un token unique pour la vérification de l'e-mail
+            $tokenRegistration = Uuid::v4()->toRfc4122();
+            $user->setTokenRegistration($tokenRegistration);
 
-            // encode the plain password
+            // Définir l'expiration du token à 24 heures
+            $user->setTokenRegistrationLifetime((new \DateTime())->add(new \DateInterval('P1D')));
+
+            // Hasher le mot de passe
+            $password = $form->get('password')->getData();
             $user->setPassword($userPasswordHasher->hashPassword($user, $password));
 
             $entityManager->persist($user);
             $entityManager->flush();
 
-            // generate a signed url and email it to the user
-            $this->emailVerifier->sendEmailConfirmation('app_verify_email', $user,
-                (new TemplatedEmail())
-                    ->from(new Address('stubborn@blabla.com', 'Stubborn'))
-                    ->to((string) $user->getEmail())
-                    ->subject('Please Confirm your Email')
-                    ->htmlTemplate('registration/confirmation_email.html.twig')
+            // Générer l'URL de confirmation
+            $confirmationUrl = $this->generateUrl(
+                'app_verify_email',
+                ['token' => $tokenRegistration],
+                \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL
             );
 
-            // do anything else you need here, like send an email
+            // Envoi de l'e-mail de confirmation
+            $mailerService->send(
+                $user->getEmail(),
+                'Confirmation de votre inscription',
+                'confirmation_email.html.twig',
+                [
+                    'user' => $user,
+                    'confirmationUrl' => $confirmationUrl,
+                    'lifetimeToken' => $user->getTokenRegistrationLifetime()->format('d-m-Y')
+                ]
+            );
+
+            $this->addFlash('success', 'Votre compte a bien été créé, veuillez vérifier vos e-mails pour l\'activer.');
 
             return $this->redirectToRoute('app_home');
         }
@@ -59,33 +75,40 @@ class RegistrationController extends AbstractController
         ]);
     }
 
-    #[Route('/verify/email', name: 'app_verify_email')]
-    public function verifyUserEmail(Request $request, TranslatorInterface $translator, UserRepository $userRepository): Response
+    #[Route('/verify-email/{token}', name: 'app_verify_email', methods: ['GET'])]
+    public function verifyEmail(
+        string $token, 
+        UserRepository $userRepository, 
+        EntityManagerInterface $entityManager,
+        UserAuthenticatorInterface $userAuthenticator,
+        UserAuthenticator $userAuthenticatorService,
+        Request $request
+        ): Response
     {
-        $id = $request->query->get('id');
+        // Récupérer l'utilisateur via le token
+        $user = $userRepository->findOneBy(['tokenRegistration' => $token]);
 
-        if (null === $id) {
-            return $this->redirectToRoute('app_register');
+        if (!$user) {
+            throw $this->createNotFoundException('Ce token est invalide.');
         }
 
-        $user = $userRepository->find($id);
-
-        if (null === $user) {
-            return $this->redirectToRoute('app_register');
+        // Vérifier si le token a expiré
+        if ($user->getTokenRegistrationLifetime() === null || new \DateTime() > $user->getTokenRegistrationLifetime()) {
+            throw new AccessDeniedException('Le lien de confirmation a expiré.');
         }
 
-        // validate email confirmation link, sets User::isVerified=true and persists
-        try {
-            $this->emailVerifier->handleEmailConfirmation($request, $user);
-        } catch (VerifyEmailExceptionInterface $exception) {
-            $this->addFlash('verify_email_error', $translator->trans($exception->getReason(), [], 'VerifyEmailBundle'));
+        // Valider l’utilisateur et supprimer le token
+        $user->setIsVerified(true);
+        $user->setTokenRegistration(null);
+        $entityManager->flush();
 
-            return $this->redirectToRoute('app_register');
-        }
+        $this->addFlash('success', 'Votre compte a bien été activé, vous pouvez maintenant vous connecter.');
 
-        // @TODO Change the redirect on success and handle or remove the flash message in your templates
-        $this->addFlash('success', 'Your email address has been verified.');
-
-        return $this->redirectToRoute('app_home');
+        //Connecter autmatiquement l'utilisateur apres activation
+        return $userAuthenticator->authenticateUser(
+            $user,
+            $userAuthenticatorService,
+            $request
+        );
     }
 }
