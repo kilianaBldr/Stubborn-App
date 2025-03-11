@@ -3,7 +3,7 @@
 {% block title %}Panier - Stubborn{% endblock %}
 
 {% block body %}
-<div class="container mt-5">
+<div class="container mt-5 text-center">
     <h1 class="mb-4">Panier</h1>
 
     {% if cart is empty %}
@@ -35,7 +35,14 @@
         <div class="d-flex justify-content-between align-items-center mt-4">
             <h4 >Total : <strong>{{ total }} €</strong></h4>
             <div>
-                <a href="{{ path('app_home') }}" class="btn btn-danger">Finaliser ma commande</a>
+            <div class="d-none">
+                <form action="{{ path('app_cart_checkout') }}" method="POST" >
+                    <button type="submit">Payer avec Stripe</button>
+                </form>
+            </div>
+                <form action="{{ path('app_cart_checkout') }}" method="POST" data-turbo="false">
+                    <button type="submit" class="btn btn-primary">Payer avec Stripe</button>
+                </form>
                 <a href="{{ path('app_products') }}" class="btn btn-success">Continuer mes achats</a>
             </div>
         </div>
