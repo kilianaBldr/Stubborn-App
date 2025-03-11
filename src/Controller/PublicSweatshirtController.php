@@ -16,4 +16,6 @@ final class PublicSweatshirtController extends AbstractController
             'sweatshirt' => $sweatshirt,
         ]);
     }
+
+    
 }
