@@ -32,6 +32,19 @@ class UserAuthenticator extends AbstractLoginFormAuthenticator
 
         $request->getSession()->set(SecurityRequestAttributes::LAST_USERNAME, $name);
 
+        //Récupere l'utilisateur depuis le repository
+        $user = $this->userRepository->findByOne(['email' => $name]);
+
+        if(!$user) {
+            throw new CustomUserMessageAuthenticationException('Identifiants incorrects.');
+        }
+        //Vérifier si l'utilisateur a validé son e-mail
+        if(!$user->isVerified()) {
+            throw new CustomUserMessageAuthenticationException(
+                'Veuillez valider votre e-mail avant de vous connecter.'
+            );
+        }
+
         return new Passport(
             new UserBadge($name),
             new PasswordCredentials($request->getPayload()->getString('password')),
