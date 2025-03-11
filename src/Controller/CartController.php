@@ -2,6 +2,11 @@
 
 namespace App\Controller;
 
+use App\Entity\Sweatshirt;
+use App\Service\StripeService;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -57,4 +62,118 @@ class CartController extends AbstractController
         $this->addFlash('success', 'Panier vidé.');
         return $this->redirectToRoute('app_cart');
     }
+
+    #[Route('/checkout', name:'app_cart_checkout')]
+    public function checkout(EntityManagerInterface $entityManager, SessionInterface $session, StripeService $stripeService): Response
+    {
+        $cart = $session->get('cart', []);
+        $lineItems = [];
+
+        foreach($cart as $item){
+            $sweatshirt = $entityManager->getRepository(Sweatshirt::class)->find($item['id']);
+            if($sweatshirt){
+                $lineItems[]=[
+                    'price_data'=>[
+                        'currency'=>'eur',
+                        'product_data'=>[
+                            'name'=>$sweatshirt->getName() . ' - Taille ' . $item['size'],
+                        ],
+                        'unit_amount'=>$sweatshirt->getPrice() * 100,
+                    ],
+                    'quantity'=> 1,
+                ];
+            }
+        }
+
+        $successUrl = $this->generateUrl('app_cart_success', [], \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL);
+        $cancelUrl = $this->generateUrl('app_cart_cancel', [], \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL);
+
+        $sessionStripe = $stripeService->createCheckoutSession($lineItems, $successUrl, $cancelUrl);
+
+        return $this->redirect($sessionStripe->url, 303);
+    }
+
+    #[Route('/success', name: 'app_cart_success')]
+    public function success(SessionInterface $session, EntityManagerInterface $entityManager): Response
+    {
+        $cart = $session->get('cart', []);
+        $lineItems = [];
+
+        foreach($cart as $item){
+            $sweatshirt = $entityManager->getRepository(Sweatshirt::class)->find($item['id']);
+            if($sweatshirt){
+                switch($item['size']){
+                    case 'XS':
+                        $currentStock = $sweatshirt->getStockXS();
+                        if($currentStock>0){
+                            $sweatshirt->setStockXS($currentStock - 1);
+                        } else {
+                            return $this->render('cart/stock_error.html.twig',[
+                                'message'=>'Le stock en taille XS de cet article n\'est plus disponible'
+                            ]);
+                        }
+                        break;
+                    case 'S':
+                        $currentStock = $sweatshirt->getStockS();
+                        if($currentStock>0){
+                            $sweatshirt->setStockS($currentStock - 1);
+                        } else {
+                            return $this->render('cart/stock_error.html.twig',[
+                                'message'=>'Le stock en taille S de cet article n\'est plus disponible'
+                            ]);
+                        }
+                        break;
+                    case 'M':
+                        $currentStock = $sweatshirt->getStockM();
+                        if($currentStock>0){
+                            $sweatshirt->setStockM($currentStock - 1);
+                        } else {
+                            return $this->render('cart/stock_error.html.twig',[
+                                'message'=>'Le stock en taille M de cet article n\'est plus disponible'
+                            ]);
+                        }
+                        break;
+                    case 'L':
+                        $currentStock = $sweatshirt->getStockL();
+                        if($currentStock>0){
+                            $sweatshirt->setStockL($currentStock - 1);
+                        } else {
+                            return $this->render('cart/stock_error.html.twig',[
+                                'message'=>'Le stock en taille L de cet article n\'est plus disponible'
+                            ]);
+                        }
+                        break;
+                    case 'XL':
+                        $currentStock = $sweatshirt->getStockXL();
+                        if($currentStock>0){
+                            $sweatshirt->setStockXL($currentStock - 1);
+                        } else {
+                            return $this->render('cart/stock_error.html.twig',[
+                                'message'=>'Le stock en taille XL de cet article n\'est plus disponible'
+                            ]);
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        $entityManager->flush();
+        $session->remove('cart');
+        $homeUrl = $this->generateUrl('app_home', [], \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL);
+        return $this->render('cart/success.html.twig', [
+            'homeUrl' => $homeUrl
+        ]);
+    }
+
+    #[Route('/cancel', name: 'app_cart_cancel')]
+    public function cancel(): Response
+    {
+        $homeUrl = $this->generateUrl('app_home', [], \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL);
+        // Display a cancellation message or redirect to cart
+        return $this->render('cart/cancel.html.twig', [
+            'homeUrl' => $homeUrl
+        ]);
+    }
+
 }
