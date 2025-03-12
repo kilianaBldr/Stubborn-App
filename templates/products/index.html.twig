@@ -35,7 +35,9 @@
                             <div class="card-body text-center">
                                 <h5 class="card-title">{{ sweatshirt.name }}</h5>
                                 <p class="card-text"><strong>{{ sweatshirt.price }} €</strong></p>
-                                <a href="{{ path('sweatshirt_detail', {'id': sweatshirt.id}) }}" class="btn btn-primary">Voir</a>
+                                {% if app.user %}
+                                    <a href="{{ path('sweatshirt_detail', {'id': sweatshirt.id}) }}" class="btn btn-primary">Voir</a>
+                                {% endif %}
                             </div>
                         </div>
                     </div>

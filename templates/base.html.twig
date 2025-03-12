@@ -31,7 +31,7 @@
                 <a href="{{ path('app_cart') }}">Panier</a>
             
             {% if 'ROLE_ADMIN' in app.user.roles %}
-                <a href="{{ path('admin_sweatshirts') }}">Admin</a>
+                <a href="{{ path('admin_sweatshirts') }}">Back-Office</a>
             {% endif %}
                 <a href="{{ path('app_logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Se Déconnecter</a>
                 <form id="logout-form" action="{{ path('app_logout') }}" method="post" style="display: none;" </form>

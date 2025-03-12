@@ -1,11 +1,11 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Echec du paiment{% endBlock %}
+{% block title %}Echec du paiment{% endblock %}
 
 {% block body %}
     <div class="container mt-5 text-center">
         <h1 class="text-danger">Echec du paiment</h1>
-        <p>Un problème est survenu lors du paiement Veuillez réessayer/p>
+        <p>Un problème est survenu lors du paiement Veuillez réessayer</p>
         <a href="{{ path('app_cart') }}" class="btn btn-warning">Retour au panier</a>
     </div>
 {% endblock %}
