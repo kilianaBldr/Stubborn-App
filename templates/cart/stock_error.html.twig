@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Erreur de stock{% endblock %}
+
+{% block body %}
+    <div class="container mt-5 text-center">
+        <h1 class="text-danger">Stock Insuffisant</h1>
+       
+        <a href="{{ path('app_cart') }}" class="btn btn-primary">Retour au panier</a>
+        <a href="{{ path('app_home') }}" class="btn btn-secondary">Retour à l'accueil</a>
+    </div>
+{% endblock %}

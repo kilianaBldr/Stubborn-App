@@ -12,7 +12,9 @@
                 <img src="{{ asset('uploads/images/sweatshirts/' ~ sweatshirt.imageName) }}" alt="{{ sweatshirt.name }}">
                 <h2>{{ sweatshirt.name }}</h2>
                 <p>Prix : {{ sweatshirt.price }}€</p>
-                <a href="{{ path('sweatshirt_detail', {'id': sweatshirt.id}) }}" class="btn btn-primary">Voir</a>
+                {% if app.user %}
+                    <a href="{{ path('sweatshirt_detail', {'id': sweatshirt.id}) }}" class="btn btn-primary">Voir</a>
+                {% endif %}
             </div>
         {% else %}
             <p>Auncun produit mis en avant pour le moment.</p>
